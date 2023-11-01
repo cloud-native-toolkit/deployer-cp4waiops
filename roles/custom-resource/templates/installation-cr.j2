@@ -1,0 +1,22 @@
+apiVersion: orchestrator.aiops.ibm.com/v1alpha1
+kind: Installation
+metadata:
+  name: "{{ CP4WAIOPS_NAME }}"
+  namespace: "{{ PROJECT_CP4WAIOPS }}"
+spec:
+  size: "{{ CP4WAIOPS_SIZE }}"
+  storageClass: "{{ STG_CLASS }}"
+  storageClassLargeBlock: "{{ STG_CLASS_BLOCK }}"
+  imagePullSecret: ibm-entitlement-key
+  topologyModel: "{{ TOPOLOGY_TERMINOLOGY }}"
+  license:
+    accept: {{ ACCEPT_LICENSE }}
+  pakModules:
+  - name: aiopsFoundation
+    enabled: true
+  - name: applicationManager
+    enabled: true
+  - name: aiManager
+    enabled: true
+  - name: connection
+    enabled: {{ SECURE_TUNNEL }}

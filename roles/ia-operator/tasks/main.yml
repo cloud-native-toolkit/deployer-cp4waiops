@@ -1,0 +1,19 @@
+---
+# tasks file for ia-operator
+- name: Get OperatorGroups
+  kubernetes.core.k8s_info:
+    api_version: operators.coreos.com/v1
+    kind: OperatorGroup
+    namespace: "{{ PROJECT_CP4WAIOPS }}"
+  register: OPERATOR_GROUPS_OUTPUT
+
+- name: Configure an OperatorGroup
+  kubernetes.core.k8s:
+    template: ./operator-group.j2
+    state: present
+  when: OPERATOR_GROUPS_OUTPUT | json_query('resources[*]') | list | length == 0   # and existing OperatorGroup does not exist
+
+- name: Configure an IBM Automation Foundation Subscription
+  kubernetes.core.k8s:
+    template: ./subscription.j2
+    state: present

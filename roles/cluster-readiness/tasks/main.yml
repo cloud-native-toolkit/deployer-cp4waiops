@@ -1,0 +1,7 @@
+---
+# tasks file for cluster-readiness
+- name: Verify the Red Hat OpenShift cluster is correctly set up for an IBM Cloud Pak for Watson AIOps configuration
+  ansible.builtin.script: ./roles/cluster-readiness/files/prereq.sh
+  # args:
+  #   one: test
+  #   two: test

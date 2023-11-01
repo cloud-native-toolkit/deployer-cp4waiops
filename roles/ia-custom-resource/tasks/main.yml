@@ -1,0 +1,27 @@
+---
+# tasks file for ia-custom-resource
+- name: Configure the IAConfig custom resource
+  kubernetes.core.k8s:
+    template: ./ia-config-cr-default.j2
+    state: present
+
+
+# - name: Wait for Infrastructure Automation operator
+#   kubernetes.core.k8s_info:
+#     kind: ibm-infrastructure-automation-operator-controller-manager
+#     wait: yes
+#     # label_selectors:
+#     #   - app.kubernetes.io/instance=csv-label
+#     namespace: "{{ PROJECT_CP4WAIOPS }}"
+#     wait_sleep: 10
+#     wait_timeout: 720
+
+# - name: Wait for Deployment
+#   kubernetes.core.k8s_info:
+#     kind: iaconfigs.aiops.ibm.com
+#     wait: yes
+#     # label_selectors:
+#     #   - app.kubernetes.io/instance=csv-label
+#     namespace: "{{ PROJECT_CP4WAIOPS }}"
+#     wait_sleep: 10
+#     wait_timeout: 720

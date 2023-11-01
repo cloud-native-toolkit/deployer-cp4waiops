@@ -1,0 +1,6 @@
+# -------------------------------------------------------------------------------------------------------
+# Storage
+# -------------------------------------------------------------------------------------------------------
+STG_CLASS: "{{ lookup('ansible.builtin.env', 'STG_CLASS') }}"
+STG_CLASS_BLOCK: "{{ lookup('ansible.builtin.env', 'STG_CLASS_BLOCK') }}"
+PROJECT_CP4WAIOPS: "{{ lookup('ansible.builtin.env', 'PROJECT_CP4WAIOPS') }}"

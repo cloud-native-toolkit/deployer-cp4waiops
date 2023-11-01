@@ -1,0 +1,6 @@
+---
+# tasks file for project
+- name: Configure a Project
+  kubernetes.core.k8s:
+    template: ./project-request.j2
+    state: present

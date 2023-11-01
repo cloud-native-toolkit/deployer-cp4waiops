@@ -1,0 +1,8 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: cp4waiops-operator-group
+  namespace: "{{ PROJECT_CP4WAIOPS }}"
+spec:
+  targetNamespaces:
+    - "{{ PROJECT_CP4WAIOPS }}"

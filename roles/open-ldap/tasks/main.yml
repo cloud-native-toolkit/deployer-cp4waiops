@@ -1,0 +1,31 @@
+---
+# tasks file for open-ldap
+- name: Configure a Project
+  kubernetes.core.k8s:
+    template: ./project-request.j2
+    state: present
+
+- name: Configure a Service Account
+  kubernetes.core.k8s:
+    template: ./service-account.j2
+    state: present
+
+- name: Configure a Cluster Role Binding
+  kubernetes.core.k8s:
+    template: ./cluster-role-binding.j2
+    state: present
+
+- name: Configure a Secret
+  kubernetes.core.k8s:
+    template: ./secret.j2
+    state: present
+
+- name: Configure a Deployment
+  kubernetes.core.k8s:
+    template: ./deployment.j2
+    state: present
+
+- name: Configure a Service
+  kubernetes.core.k8s:
+    template: ./service.j2
+    state: present

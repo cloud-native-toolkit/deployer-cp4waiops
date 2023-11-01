@@ -1,0 +1,93 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: cp4waiops
+  namespace: default
+spec:
+  pipelineRef:
+    name: cp4waiops
+    # resolver: hub
+    #   params:
+    #   - name: catalog
+    #     value: tekton-catalog-pipelines
+    #   - name: type
+    #     value: artifact
+    #   - name: kind
+    #     value: pipeline
+    #   - name: name
+    #     value: git-clone
+    #   - name: version
+    #     value: "0.6"
+    #   # - name: sample-pipeline-parameter
+    #   #   value: test
+  podTemplate:
+    env:
+      - name: STG_CLASS
+        value: "ocs-storagecluster-cephfs"
+      - name: STG_CLASS_BLOCK
+        value: "ocs-storagecluster-ceph-rbd"
+      - name: PROJECT_CP4WAIOPS
+        value: "cp4waiops"
+      - name: CUSTOMER_NAME
+        value: "IBM"
+      - name: CUSTOMER_ICN
+        value: "NA"
+      - name: CUSTOMER_ENVIRONMENT
+        value: "poc"
+      - name: IBM_ENTITLEMENT_KEY
+        value: "<PLACEHOLDER>"
+  workspaces:
+  - name: output
+    persistentVolumeClaim:
+      claimName: ansible-playbooks
+  - name: ssh-directory
+    secret:
+      secretName: git-credentials
+  - name: runner-dir
+    persistentVolumeClaim:
+      claimName: ansible-playbooks
+  # serviceAccountName: ansible-deployer-account
+  params:
+  - name: deleteExisting
+    value: "true"
+  - name: depth
+    value: "1"
+  - name: gitInitImage
+    value: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.21.0
+  - name: httpProxy
+    value: ""
+  - name: httpsProxy
+    value: ""
+  - name: noProxy
+    value: ""
+  - name: refspec
+    value: ""
+  - name: revision
+    value: main
+  - name: sparseCheckoutDirectories
+    value: ""
+  - name: sslVerify
+    value: "true"
+  - name: subdirectory
+    value: ""
+  - name: submodules
+    value: "true"
+  - name: url
+    value: git@github.ibm.com:Nate-Malone/techzone-cp4waiops.git
+  - name: userHome
+    value: /tekton/home
+  - name: verbose
+    value: "true"
+  - name: args
+    value:
+    - -p
+    - cp4waiops.yaml
+    # - -vvv
+  - name: image
+    value: quay.io/ansible/ansible-runner:stable-2.12-latest
+  - name: project-dir
+    value: ""
+  - name: user-home
+    value: /tekton/home
+  

@@ -1,0 +1,6 @@
+ACCEPT_LICENSE_IA: true # Set to `true` to agree to the license terms, otherwise install will fail.
+ACCEPT_LICENSE_IM: true # Set to `true` to agree to the license terms, otherwise install will fail.
+LDAP_ADMIN_USERNAME: ''
+LDAP_ADMIN_PASSWORD: ''
+LDAP_USERS: ''
+LDAP_PASSWORDS: ''

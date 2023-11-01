@@ -1,0 +1,161 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ansible-playbooks
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: cp4waiops
+  namespace: default
+spec:
+  workspaces:
+    - name: output
+    - name: ssh-directory
+    - name: runner-dir
+  params:
+  - name: deleteExisting
+    type: string
+  - name: depth
+    type: string
+  - name: gitInitImage
+    type: string
+  - name: httpProxy
+    type: string
+  - name: httpsProxy
+    type: string
+  - name: noProxy
+    type: string
+  - name: refspec
+    type: string
+  - name: revision
+    type: string
+  - name: sparseCheckoutDirectories
+    type: string
+  - name: sslVerify
+    type: string
+  - name: subdirectory
+    type: string
+  - name: submodules
+    type: string
+  - name: url
+    type: string
+  - name: userHome
+    type: string
+  - name: verbose
+    type: string
+  - name: args
+    type: array
+  - name: image
+    type: string
+  - name: project-dir
+    type: string
+  - name: user-home
+    type: string
+  tasks:
+    - name: add-git-clone
+      taskRef:
+        resolver: hub
+        params:
+          # - name: name
+          #   value: git-clone
+          # - name: version
+          #   value: "0.9"
+        - name: catalog # optional
+          value: tekton-catalog-tasks
+        - name: type # optional
+          value: artifact 
+        - name: kind
+          value: task
+        - name: name
+          value: git-clone
+        - name: version
+          value: "0.6"
+    - name: add-ansible-runner
+      runAfter:
+        - add-git-clone
+      taskRef:
+        resolver: hub
+        params:
+          # - name: name
+          #   value: ansible-runner
+          # - name: version
+          #   value: "0.2"
+        - name: catalog # optional
+          value: tekton-catalog-tasks
+        - name: type # optional
+          value: artifact 
+        - name: kind
+          value: task
+        - name: name
+          value: ansible-runner
+        - name: version
+          value: "0.2"
+    - name: git-clone
+      runAfter:
+        - add-ansible-runner
+      taskRef:
+        # kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: output
+        - name: ssh-directory
+          workspace: ssh-directory
+      params:
+      - name: deleteExisting
+        value: $(params.deleteExisting)
+      - name: depth
+        value: $(params.depth)
+      - name: gitInitImage
+        value: $(params.gitInitImage)
+      - name: httpProxy
+        value: $(params.httpProxy)
+      - name: httpsProxy
+        value: $(params.httpsProxy)
+      - name: noProxy
+        value: $(params.noProxy)
+      - name: refspec
+        value: $(params.refspec)
+      - name: revision
+        value: $(params.revision)
+      - name: sparseCheckoutDirectories
+        value: $(params.sparseCheckoutDirectories)
+      - name: sslVerify
+        value: $(params.sslVerify)
+      - name: subdirectory
+        value: $(params.subdirectory)
+      - name: submodules
+        value: $(params.submodules)
+      - name: url
+        value: $(params.url)
+      - name: userHome
+        value: $(params.userHome)
+      - name: verbose
+        value: $(params.verbose)
+    - name: ansible-runner
+      runAfter:
+        - git-clone
+      taskRef:
+        name: ansible-runner
+      workspaces:
+        - name: runner-dir
+          workspace: runner-dir
+      params:
+      - name: args
+        value: $(params.args[*])
+      - name: image
+        value: $(params.image)
+      - name: project-dir
+        value: $(params.project-dir)
+      - name: user-home
+        value: $(params.user-home)

@@ -1,0 +1,47 @@
+---
+# tasks file for catalog-source
+- name: Configure the CatalogSource with Automatic Patch Upgrades
+  kubernetes.core.k8s:
+    template: ./catalog-source-auto-upgrades.j2
+    state: present
+  when: ENABLE_AUTO_PATCH_UPGRADES
+
+- name: Configure the CatalogSource with current image digest
+  block: 
+  - name: Configure the CatalogSource
+    kubernetes.core.k8s:
+      template: ./catalog-source.j2
+      state: present
+
+  - name: Get image digest
+    kubernetes.core.k8s_info:
+      api_version: 
+      kind: Pod
+      wait: yes
+      label_selectors:
+        - olm.catalogSource=ibm-operator-catalog
+      namespace: openshift-marketplace
+      wait_sleep: 10
+      wait_timeout: 720
+    register: IMAGE_DIGEST_OUTPUT
+    until: IMAGE_DIGEST_OUTPUT | json_query('resources[*].status.containerStatuses[0].imageID') | select() | length > 0
+    retries: 72
+    delay: 10
+
+  - name: Set image digest
+    set_fact: IMAGE_DIGEST={{ IMAGE_DIGEST_OUTPUT | json_query('resources[*].status.containerStatuses[0].imageID') }}
+
+  - name: Update the CatalogSource image digest
+    kubernetes.core.k8s_json_patch:
+      api_version: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      namespace: openshift-marketplace
+      name: ibm-operator-catalog
+      patch:
+        - op: test
+          path: "/spec/image"
+          value: "icr.io/cpopen/ibm-operator-catalog:latest"
+        - op: replace
+          path: "/spec/image"
+          value: "{{ IMAGE_DIGEST[0] }}"
+  when: not ENABLE_AUTO_PATCH_UPGRADES

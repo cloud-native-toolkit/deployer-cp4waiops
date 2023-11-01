@@ -1,0 +1,7 @@
+---
+# tasks file for entitlement-key
+- name: Configure an entitlement key secret
+  kubernetes.core.k8s:
+    template: ./entitlement-key-secret.j2
+    state: present
+  

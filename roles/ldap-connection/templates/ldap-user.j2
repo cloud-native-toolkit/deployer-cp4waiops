@@ -1,0 +1,16 @@
+{
+  "LDAP_ID": "OpenLDAP",
+  "LDAP_URL": "ldap://openldap.openldap.svc:1389",
+  "LDAP_BASEDN": "dc=example,dc=org",
+  "LDAP_BINDDN": "cn=admin,dc=example,dc=org",
+  "LDAP_BINDPASSWORD": "{{ LDAP_ADMIN_PASSWORD | b64encode }}",
+  "LDAP_TYPE": "Custom",
+  "LDAP_USERFILTER": "(&(uid=%v)(objectclass=person))",
+  "LDAP_GROUPFILTER": "(&(cn=%v)(objectclass=groupOfNames))",
+  "LDAP_USERIDMAP": "*:uid",
+  "LDAP_GROUPIDMAP": "*:cn",
+  "LDAP_GROUPMEMBERIDMAP": "groupOfNames:member",
+  "LDAP_USER_SEARCHBASE_LIST": [
+    "OU=records,dc=example,dc=org"
+  ]
+}

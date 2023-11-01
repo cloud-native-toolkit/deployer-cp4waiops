@@ -1,0 +1,23 @@
+kind: EgressNetworkPolicy
+metadata:
+  name: default
+spec:
+  egress:
+  - type: Allow
+    to:
+      cidrSelector: <1.2.3.0/24>
+  - type: Allow
+    to:
+      dnsName: <www.github.com>
+  - type: Allow
+    to:
+      dnsName: <www.developer.kubernetes.com>
+  - type: Allow
+    to:
+      dnsName: <www.developer.servicenow.com>
+  - type: Allow
+    to:
+      dnsName: <www.developer.vcenter.com>
+  - type: Deny
+    to:
+      cidrSelector: <0.0.0.0/0>

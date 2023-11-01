@@ -1,0 +1,63 @@
+---
+# tasks file for operator
+- name: Configure an OperatorGroup
+  kubernetes.core.k8s:
+    template: ./operator-group.j2
+    state: present
+  when: INSTALL_MODE_NAMESPACE != 'openshift-operators'
+
+- name: Configure a CP4WAIOPS Subscription
+  kubernetes.core.k8s:
+    template: ./subscription.j2
+    state: present
+
+# - name: Wait for CP4WAIOPS Subscription
+#   kubernetes.core.k8s_info:
+#     api_version: operators.coreos.com/v1alpha1
+#     kind: Subscription
+#     name: ibm-aiops-orchestrator
+#     field_selectors:
+#       - status.phase=Succeeded
+#     wait: yes
+#     namespace: "{{ INSTALL_MODE_NAMESPACE }}"
+#     wait_sleep: 10
+#     wait_timeout: 720
+
+# - name: Wait for CP4WAIOPS Subscription CSVs
+#   kubernetes.core.k8s_info:
+#     api_version: operators.coreos.com/v1alpha1
+#     kind: ClusterServiceVersion
+#     # field_selectors:
+#     #   - status.phase=Succeeded
+#     name: ibm-aiops-orchestrator.v4.1.2
+#     wait: yes
+#     namespace: "{{ INSTALL_MODE_NAMESPACE }}"
+#     wait_sleep: 10
+#     wait_timeout: 720
+#   register: CSV_STATUS_OUTPUT
+#   until: CSV_STATUS_OUTPUT | json_query('resources[*].status.phase') | unique == ["Succeeded"]
+#   retries: 90
+#   delay: 60
+
+- name: Get a list of CSVs
+  kubernetes.core.k8s_info:
+    api_version: operators.coreos.com/v1alpha1
+    kind: ClusterServiceVersion
+    namespace: "{{ INSTALL_MODE_NAMESPACE }}"
+  register: CSV_OUTPUT
+  until: CSV_OUTPUT | json_query('resources[*]') | length >= 4
+  retries: 72
+  delay: 10
+
+- set_fact:
+    CSV_NAME: "{{ CSV_NAME | default([]) + [ item ] }}"
+  loop: "{{ CSV_OUTPUT | json_query('resources[*].metadata.name')}}"
+
+- name: Wait for CSVs
+  kubernetes.core.k8s_info:
+    api_version: operators.coreos.com/v1alpha1
+    kind: ClusterServiceVersion
+    namespace: "{{ INSTALL_MODE_NAMESPACE }}"
+    name: "{{ item }}"
+  loop: "{{ CSV_NAME }}"
+  when: '"ibm-" in item'

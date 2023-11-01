@@ -1,0 +1,50 @@
+#========================================================================================================
+# Cloud Pak for Watson AIOps installation variables
+#========================================================================================================
+
+CP4WAIOPS_NAME: 'ibm-cp-watson-aiops'
+CP4WAIOPS_SIZE: 'small' # Set to `small` if you only require a starter, non-production deployment.
+SECURE_TUNNEL: false # Set to `true` to install Secure Tunnel, otherwise set to `false`.  
+ACCEPT_LICENSE: true # Set to `true` to agree to the license terms, otherwise install will fail.
+CATALOG_SRC_CP4WAIOPS: 'ibm-operator-catalog'
+ENABLE_AUTO_PATCH_UPGRADES: true
+
+# -------------------------------------------------------------------------------------------------------
+# Your customer details
+# -------------------------------------------------------------------------------------------------------
+ENABLE_COLLECTION: true
+CUSTOMER_NAME: "{{ lookup('ansible.builtin.env', 'CUSTOMER_NAME') }}" # Company Name
+CUSTOMER_ICN: "{{ lookup('ansible.builtin.env', 'CUSTOMER_ICN') }}" # IBM Customer Numnber
+CUSTOMER_ENVIRONMENT: "{{ lookup('ansible.builtin.env', 'CUSTOMER_ENVIRONMENT') }}" # trial, poc or production
+
+# -------------------------------------------------------------------------------------------------------
+# IBM Entitled Registry
+# -------------------------------------------------------------------------------------------------------
+IBM_ENTITLEMENT_KEY: "{{ lookup('ansible.builtin.env', 'IBM_ENTITLEMENT_KEY') }}" # Set to the entitlement key retrieved in previous step.
+IMAGE_CREDENTIALS:
+  REGISTRY: 'cp.icr.io'
+  USERNAME: 'cp'
+  PASSWORD: "{{ IBM_ENTITLEMENT_KEY }}"
+DOCKER_CONFIG_JSON: |
+  {
+    "auths": {
+      "{{ IMAGE_CREDENTIALS.REGISTRY }}": {
+        "username": "{{ IMAGE_CREDENTIALS.USERNAME }}",
+        "password": "{{ IMAGE_CREDENTIALS.PASSWORD }}",
+        "auth": "{{ (IMAGE_CREDENTIALS.USERNAME + ':' + IMAGE_CREDENTIALS.PASSWORD) | b64encode }}"
+      }
+    }
+  }
+  
+# -------------------------------------------------------------------------------------------------------
+# `OwnNamespace` installation mode:  leave INSTALL_MODE_NAMESPACE as it is.
+# `AllNamespaces` installation mode: change to export INSTALL_MODE_NAMESPACE=openshift-operators
+# -------------------------------------------------------------------------------------------------------
+INSTALL_MODE_NAMESPACE: "{{ PROJECT_CP4WAIOPS }}"
+
+# -------------------------------------------------------------------------------------------------------
+# Topology resource group terminology
+# Specify `application` or `service` as the terminology to be used for collections of topology resource
+# groups. The default is `application`.
+# -------------------------------------------------------------------------------------------------------
+TOPOLOGY_TERMINOLOGY: 'application'

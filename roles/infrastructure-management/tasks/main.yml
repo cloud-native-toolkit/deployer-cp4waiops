@@ -1,0 +1,27 @@
+---
+# tasks file for infrastructure-management
+- name: Get Application Domain
+  kubernetes.core.k8s_info:
+    api_version: config.openshift.io/v1
+    kind: Ingress
+    name: cluster
+  register: APPLICATION_DOMAIN_OUTPUT
+  until: APPLICATION_DOMAIN_OUTPUT | json_query('resources[*].spec.domain') | length > 0
+
+- name: Set Application Domain
+  set_fact: APPLICATION_DOMAIN={{ APPLICATION_DOMAIN_OUTPUT | json_query('resources[*].spec.domain') }}
+
+- name: Configure an Infrastructure Management deployment
+  kubernetes.core.k8s:
+    template: ./im-install-cr.j2
+    state: present
+
+- name: Wait for Pods
+  kubernetes.core.k8s_info:
+    kind: Pod
+    wait: yes
+    label_selectors:
+      - app=ibm-infra-management-application
+    namespace: "{{ PROJECT_CP4WAIOPS }}"
+    wait_sleep: 10
+    wait_timeout: 720

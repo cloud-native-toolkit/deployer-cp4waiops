@@ -1,0 +1,10 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: "{{ CATALOG_SRC_CP4WAIOPS }}"
+  namespace: openshift-marketplace
+spec:
+  displayName: "{{ CATALOG_SRC_CP4WAIOPS }}"
+  publisher: IBM Content
+  sourceType: grpc
+  image: "icr.io/cpopen/{{ CATALOG_SRC_CP4WAIOPS }}:latest"

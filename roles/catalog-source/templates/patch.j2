@@ -1,0 +1,8 @@
+[
+  {
+    "op": "test",
+    "path": "/spec/image",
+    "value": "icr.io/cpopen/ibm-operator-catalog:latest"
+  },
+  { "op": "replace", "path": "/spec/image", "value": "{% raw %}{{ IMAGE_DIGEST }}{% raw %}" }
+]

@@ -1,0 +1,17 @@
+apiVersion: infra.management.ibm.com/v1alpha1
+kind: IMInstall
+metadata:
+  labels:
+    app.kubernetes.io/instance: ibm-infra-management-install-operator
+    app.kubernetes.io/managed-by: ibm-infra-management-install-operator
+    app.kubernetes.io/name: ibm-infra-management-install-operator
+  name: im-iminstall
+  namespace: cp4waiops
+spec:
+  applicationDomain: "inframgmtinstall.{{ APPLICATION_DOMAIN[0] }}"
+  imagePullPolicy: Always
+  imagePullSecret: ibm-entitlement-key
+  initialAdminGroupName: readers
+  storageClassName: "{{ STG_CLASS_BLOCK }}"
+  license:
+    accept: {{ ACCEPT_LICENSE_IM }}

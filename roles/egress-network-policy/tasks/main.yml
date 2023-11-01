@@ -1,0 +1,6 @@
+---
+# tasks file for egress-network-policy
+- name: Configure an Egress Network Policy
+  kubernetes.core.k8s:
+    template: ./egress-network-policy.j2
+    state: present

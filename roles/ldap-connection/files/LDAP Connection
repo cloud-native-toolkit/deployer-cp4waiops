@@ -1,0 +1,34 @@
+Connection Name
+OpenLDAP
+
+Server Type
+LDAP
+
+Base DN
+dc=example,dc=org
+
+Bind DN
+cn=admin,dc=example,dc=org
+
+Bind DN Password
+
+URL
+ldap://openldap.openldap.svc:1389
+
+Group Filter
+(&(cn=%v)(objectclass=groupOfNames))
+
+User Filter
+(&(uid=%v)(objectclass=person))
+
+Group ID map
+*:cn
+
+User ID map
+*:uid
+
+Group member ID map
+groupOfNames:member
+
+
+cloudctl iam ldap-create "LDAP" --basedn {{ current_ibmaiops_feature.ldap_base }} --server ldap://openldap.{{ current_ibmaiops_feature.ldap_namespace }}:389 --binddn cn=admin,{{ current_ibmaiops_feature.ldap_base }} --binddn-password {{ current_ldap_admin_password }} -t "Custom" --group-filter "(&(cn=%v)(objectclass=groupOfUniqueNames))" --group-id-map "*:cn" --group-member-id-map "groupOfUniqueNames:uniqueMember" --user-filter "(&(uid=%v)(objectclass=Person))" --user-id-map "*:uid"

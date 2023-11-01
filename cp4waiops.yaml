@@ -1,0 +1,16 @@
+- hosts: localhost
+  vars_files:
+    - ./group_vars/all.yaml
+    - ./group_vars/cp4waiops.yaml
+    - ./group_vars/infrastructure-automation.yaml
+  roles:
+    - role: storage
+    - role: project
+    - role: entitlement-key
+    - role: usage-data
+    - role: catalog-source
+    # - role: cluster-readiness
+    - role: operator
+    - role: custom-resource
+    # - role: egress-network-policy # optional
+    - role: access

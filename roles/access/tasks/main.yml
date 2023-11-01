@@ -1,0 +1,63 @@
+---
+# tasks file for access
+- name: Get Automation console URL
+  kubernetes.core.k8s_info:
+    api_version: route.openshift.io/v1
+    kind: Route
+    name: cpd
+    wait: yes
+    namespace: "{{ PROJECT_CP4WAIOPS }}"
+    wait_sleep: 10
+    wait_timeout: 720
+  register: AUTOMATION_CONSOLE_ROUTE_OUTPUT
+# ibm--cp-watson-aiops
+# oc get route -n ${PROJECT_CP4WAIOPS} cpd -o jsonpath='{.spec.host}'
+  until: AUTOMATION_CONSOLE_ROUTE_OUTPUT | json_query('resources[*].spec.host') | length > 0
+
+- name: Set Automation Console URL
+  set_fact: AUTOMATION_CONSOLE_ROUTE={{ AUTOMATION_CONSOLE_ROUTE_OUTPUT | json_query('resources[*].spec.host') }}
+
+# oc -n ibm-common-services get secret platform-auth-idp-credentials -o jsonpath='{.data.admin_username}' | base64 -d && echo
+- name: Get Default username
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: platform-auth-idp-credentials
+    # wait: yes
+    # label_selectors:
+    #   - app.kubernetes.io/instance=route-label
+    namespace: ibm-common-services
+    # wait_sleep: 10
+    # wait_timeout: 720
+  register: CP4WAIOPS_CONSOLE_USERNAME_OUTPUT
+  until: CP4WAIOPS_CONSOLE_USERNAME_OUTPUT | json_query('resources[*].data.admin_username') | length > 0
+    #| select() | length > 0
+
+- name: Set default username
+  set_fact: CP4WAIOPS_CONSOLE_USERNAME={{ CP4WAIOPS_CONSOLE_USERNAME_OUTPUT | json_query('resources[*].data.admin_username') | b64decode }}
+
+# oc -n ibm-common-services get secret platform-auth-idp-credentials -o jsonpath='{.data.admin_password}' | base64 -d
+- name: Get admin password
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: platform-auth-idp-credentials
+    # wait: yes
+    # label_selectors:
+    #   - app.kubernetes.io/instance=route-label
+    namespace: ibm-common-services
+    # wait_sleep: 10
+    # wait_timeout: 720
+  register: CP4WAIOPS_CONSOLE_PASSWORD_OUTPUT
+  until: CP4WAIOPS_CONSOLE_PASSWORD_OUTPUT | json_query('resources[*].data.admin_password') | length > 0
+    #| select() | length > 0
+
+- name: Set admin password
+  set_fact: CP4WAIOPS_CONSOLE_PASSWORD={{ CP4WAIOPS_CONSOLE_PASSWORD_OUTPUT | json_query('resources[*].data.admin_password') | b64decode }}
+
+- name: Output IBM Provided Credentials
+  debug:
+    msg:
+    - "Automation Console URL: https://{{ AUTOMATION_CONSOLE_ROUTE[0] }}"
+    - "Default Username: {{ CP4WAIOPS_CONSOLE_USERNAME }}"
+    - "Admin Password: {{ CP4WAIOPS_CONSOLE_PASSWORD }}"

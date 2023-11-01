@@ -1,0 +1,34 @@
+---
+# tasks file for storage
+- name: Get StorageClasses
+  kubernetes.core.k8s_info:
+    kind: StorageClass
+  register: STORAGE_CLASSES_OUTPUT
+
+# kubectl get pvc --all-namespaces -o json| jq --raw-output '.items[]|select(.metadata.annotations."meta.helm.sh/release-name"=="<your-release>")|"\(.kind) \(.metadata.name)"
+
+- name: Set StorageClasses
+  set_fact:
+    STORAGE_CLASSES: "{{ STORAGE_CLASSES_OUTPUT | json_query('resources[*].metadata.name') }}"
+
+- name: Remove Default StorageClass
+  kubernetes.core.k8s:
+    state: patched
+    kind: StorageClass
+    name: "{{ item }}"
+    definition:
+      metadata:
+        annotations:
+          storageclass.kubernetes.io/is-default-class: 'false'
+  with_items: "{{ STORAGE_CLASSES }}"
+  when: item != STG_CLASS_BLOCK
+
+- name: Set Default StorageClass
+  kubernetes.core.k8s:
+    state: patched
+    kind: StorageClass
+    name: "{{ STG_CLASS_BLOCK }}"
+    definition:
+      metadata:
+        annotations:
+          storageclass.kubernetes.io/is-default-class: 'true'

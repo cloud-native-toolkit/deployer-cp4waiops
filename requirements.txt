@@ -1,0 +1,7 @@
+ansible-core>=2.13.9
+ansible-base==2.10.17
+openshift
+# pyyaml
+kubernetes
+# jsonpatch
+jmespath

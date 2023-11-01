@@ -1,0 +1,20 @@
+kind: IAConfig
+apiVersion: aiops.ibm.com/v1alpha1
+metadata:
+  name: ibm-ia-installer
+  namespace: cp4waiops
+spec:
+  imagePullSecret: ibm-entitlement-key
+  infraAutoComposableComponents:
+  - enabled: <Set to true to install Infrastructure Management component of Infrastructure Automation, false otherwise>
+    name: ibm-management-im-install
+    spec: {}
+  - enabled: <Set to true to install Managed services component of Infrastructure Automation, false otherwise>
+    name: ibm-management-cam-install
+    spec:
+      manageservice:
+        <Set your custom installation parameter values>
+  license:
+    accept: {{ ACCEPT_LICENSE_IA }}
+  storageClass: "{{ STG_CLASS }}"
+  storageClassLargeBlock: "{{ STG_CLASS_BLOCK }}"

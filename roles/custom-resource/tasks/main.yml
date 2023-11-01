@@ -1,0 +1,20 @@
+---
+# tasks file for custom-resource
+- name: Configure an Installation Custom Resource
+  kubernetes.core.k8s:
+    template: ./installation-cr.j2
+    state: present
+
+- name: Wait for Installation Custom Resource (60-90 minutes)
+  kubernetes.core.k8s_info:
+    api_version: orchestrator.aiops.ibm.com/v1alpha1
+    kind: Installation
+    name: "{{ CP4WAIOPS_NAME }}"
+    wait: yes
+    namespace: "{{ PROJECT_CP4WAIOPS }}"
+    wait_sleep: 60
+    wait_timeout: 5400
+  register: INSTALLATION_OUTPUT
+  until: INSTALLATION_OUTPUT | json_query('resources[*].status.phase') | unique == ["Running"]
+  retries: 90
+  delay: 60

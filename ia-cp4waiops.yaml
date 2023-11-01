@@ -1,0 +1,11 @@
+- hosts: localhost
+  vars_files:
+    - ./group_vars/all.yaml
+    - ./group_vars/infrastructure-automation.yaml
+  roles:
+    - role: ia-operator
+    - role: ia-custom-resource
+    # - role: egress-network-policy # optional
+    - role: open-ldap
+    - role: infrastructure-management
+    - role: access

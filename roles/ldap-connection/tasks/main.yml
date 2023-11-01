@@ -1,0 +1,112 @@
+---
+# tasks file for ldap-connection
+- name: Get Application Domain
+  kubernetes.core.k8s_info:
+    api_version: config.openshift.io/v1
+    kind: Ingress
+    name: cluster
+  register: APPLICATION_DOMAIN_OUTPUT
+  until: APPLICATION_DOMAIN_OUTPUT | json_query('resources[*].spec.domain') | length > 0
+# oc get route -n ibm-common-services cp-console -o jsonpath=‘{.spec.host}’
+
+- name: Set Application Domain
+  set_fact:
+    APPLICATION_DOMAIN: "{{ APPLICATION_DOMAIN_OUTPUT.stdout }}"
+
+- name: Configure LDAP group json
+  ansible.builtin.template:
+    src: ./roles/ldap-connection/templates/ldap-group.j2
+    dest: ./roles/ldap-connection/files/ldap-group.json
+
+- name: Login to Automation Console
+  register: LOGIN_RESULT
+  ansible.builtin.uri:
+    url: "https://{{ APPLICATION_DOMAIN }}/idprovider/v1/auth/identitytoken"
+    method: POST
+    body_format: form-urlencoded
+    body: grant_type=password&username=admin&password=admin&scope=openid
+    # body_format: application/x-www-form-urlencoded
+    body: '{
+      "username": "{{ TURBO_SERVER_ADMINUSER }}",
+      "password": "{{ TURBO_SERVER_ADMINUSER_PWD }}"
+      }'
+    validate_certs: no
+    status_code: 200
+    timeout: 30
+
+- name: Configure login cookie
+  set_fact:
+    LOGIN_RESULT: "{{ LOGIN_RESULT }}"
+
+- name: Enable the custom search base for LDAP group entity while creating an LDAP connection
+  ansible.builtin.uri:
+    url: "https://{{ APPLICATION_DOMAIN }}/idprovider/v3/auth/idsource/{uid}"
+    method: POST
+    return_content: yes
+    status_code: 200
+    body_format: json
+    body: "{{ lookup('template', './roles/ldap-connection/files/ldap-group.json') }}"
+    validate_certs: no
+    headers:
+      Cookie: "{{ LOGIN_RESULT.cookies_string }}"
+# - name: Login to Turbonomic
+#   register: LOGIN_RESULT
+#   ansible.builtin.uri:
+#     url: "https://{{ TURBO_SERVER_URL_API }}/api/v3/login?hateoas=true"
+#     method: POST
+#     body_format: form-urlencoded
+#     body: '{
+#       "username": "{{ TURBO_SERVER_ADMINUSER }}",
+#       "password": "{{ TURBO_SERVER_ADMINUSER_PWD }}"
+#       }'
+#     validate_certs: no
+#     status_code: 200
+#     timeout: 30
+
+# - name: Configure login cookie
+#   set_fact:
+#     LOGIN_RESULT: "{{ LOGIN_RESULT }}"
+
+# - name: Configure Turbonomic license
+#   ansible.builtin.uri:
+#     url: "https://{{ TURBO_SERVER_URL_API }}/api/v3/licenses"
+#     method: POST
+#     return_content: yes
+#     status_code: 200
+#     body_format: form-multipart
+#     body:
+#       file:
+#         content: '{{ lookup("file", "./roles/turbonomic-users-license-group-policy/files/turbonomic-license.lic") }}'
+#         filename: "turbonomic-license.lic"
+#         mime_type: application/xml
+#     validate_certs: no
+#     headers:
+#       Cookie: "{{ LOGIN_RESULT.cookies_string }}"
+
+# - name: Wait for license add
+#   ansible.builtin.pause:
+#     minutes: 1
+
+# - name: Configure Turbonomic user
+#   ansible.builtin.uri:
+#     url: "https://{{ TURBO_SERVER_URL_API }}/api/v3/users"
+#     method: POST
+#     return_content: yes
+#     status_code: 200
+#     body_format: json
+#     body: "{{ lookup('template', './roles/turbonomic-users-license-group-policy/files/user.json') }}"
+#     validate_certs: no
+#     headers:
+#       Cookie: "{{ LOGIN_RESULT.cookies_string }}"
+
+# - name: Configure Group
+#   ansible.builtin.uri:
+#     url: "https://{{ TURBO_SERVER_URL_API }}/api/v3/groups"
+#     method: POST
+#     return_content: yes
+#     status_code: 200
+#     body_format: json
+#     body: "{{ lookup('file', './roles/turbonomic-users-license-group-policy/files/group.json') }}"
+#     validate_certs: no
+#     headers:
+#       Cookie: "{{ LOGIN_RESULT.cookies_string }}"

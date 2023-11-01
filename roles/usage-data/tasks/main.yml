@@ -1,0 +1,13 @@
+---
+# tasks file for usage-data
+- name: Configure the collection of usage data
+  kubernetes.core.k8s:
+    template: ./enable-usage-data-secret.j2
+    state: present
+  when: ENABLE_COLLECTION
+
+- name: Disable the collection of usage data
+  kubernetes.core.k8s:
+    template: ./usage-data-secret.j2
+    state: present
+  when: not ENABLE_COLLECTION
