@@ -1,3 +1,11 @@
+Reserve a UPI TechZone cluster with the following requirements:
+```
+OpenShift Version: 4.10 - 4.12
+OCS/ODF Size: 2TiB
+Worker Node Count: 5
+Worker Node Flavor: 16 vCPU x 64 GB - 100 GB ephemeral storage
+```
+
 ENABLE_COLLECTION set to false outputs the following error:
 
 ```
