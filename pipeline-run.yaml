@@ -42,6 +42,7 @@ spec:
     persistentVolumeClaim:
       claimName: ansible-playbooks
   # - name: ssh-directory
+  #   emptydir: {}
     # secret:
     #   secretName: git-credentials
   - name: runner-dir
@@ -74,7 +75,7 @@ spec:
   - name: submodules
     value: "true"
   - name: url
-    value: git@github.com:cloud-native-toolkit/deployer-cp4waiops.git
+    value: https://github.com/cloud-native-toolkit/deployer-cp4waiops.git
   - name: userHome
     value: /tekton/home
   - name: verbose

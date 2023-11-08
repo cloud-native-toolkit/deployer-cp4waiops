@@ -1,17 +1,4 @@
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ansible-playbooks
-  namespace: default
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 1Gi
----
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
@@ -321,7 +308,7 @@ metadata:
 spec:
   workspaces:
     - name: output
-    - name: ssh-directory
+    # - name: ssh-directory
     - name: runner-dir
   params:
   - name: deleteExisting
@@ -362,15 +349,43 @@ spec:
     type: string
   - name: user-home
     type: string
+  - name: storage-class
+    type: string
+    default: "ocs-storagecluster-cephfs"
   tasks:
+    - name: create-pvc
+      retries: 3
+      taskRef:
+        kind: Task
+        name: ibm-pak
+      params:
+        - name: SCRIPT
+          value: |
+            oc apply -f - <<EOF
+            apiVersion: v1 
+            kind: PersistentVolumeClaim
+            metadata:
+              name: ansible-playbooks
+              namespace: default
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              storageClassName: $(params.storage-class)
+              volumeMode: Filesystem
+              resources:
+                requests:
+                  storage: 1Gi
+            EOF
     - name: git-clone
       taskRef:
         name: git-clone
+      runAfter:
+        - create-pvc
       workspaces:
         - name: output
           workspace: output
-        - name: ssh-directory
-          workspace: ssh-directory
+        # - name: ssh-directory
+        #   workspace: ssh-directory
       params:
       - name: deleteExisting
         value: $(params.deleteExisting)
