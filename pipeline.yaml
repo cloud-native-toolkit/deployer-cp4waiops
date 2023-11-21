@@ -116,50 +116,50 @@ spec:
     - name: clone
       image: "$(params.gitInitImage)"
       env:
-      - name: HOME
-        value: "$(params.userHome)"
-      - name: PARAM_URL
-        value: $(params.url)
-      - name: PARAM_REVISION
-        value: $(params.revision)
-      - name: PARAM_REFSPEC
-        value: $(params.refspec)
-      - name: PARAM_SUBMODULES
-        value: $(params.submodules)
-      - name: PARAM_DEPTH
-        value: $(params.depth)
-      - name: PARAM_SSL_VERIFY
-        value: $(params.sslVerify)
-      - name: PARAM_SUBDIRECTORY
-        value: $(params.subdirectory)
-      - name: PARAM_DELETE_EXISTING
-        value: $(params.deleteExisting)
-      - name: PARAM_HTTP_PROXY
-        value: $(params.httpProxy)
-      - name: PARAM_HTTPS_PROXY
-        value: $(params.httpsProxy)
-      - name: PARAM_NO_PROXY
-        value: $(params.noProxy)
-      - name: PARAM_VERBOSE
-        value: $(params.verbose)
-      - name: PARAM_SPARSE_CHECKOUT_DIRECTORIES
-        value: $(params.sparseCheckoutDirectories)
-      - name: PARAM_USER_HOME
-        value: $(params.userHome)
-      - name: WORKSPACE_OUTPUT_PATH
-        value: $(workspaces.output.path)
-      - name: WORKSPACE_SSH_DIRECTORY_BOUND
-        value: $(workspaces.ssh-directory.bound)
-      - name: WORKSPACE_SSH_DIRECTORY_PATH
-        value: $(workspaces.ssh-directory.path)
-      - name: WORKSPACE_BASIC_AUTH_DIRECTORY_BOUND
-        value: $(workspaces.basic-auth.bound)
-      - name: WORKSPACE_BASIC_AUTH_DIRECTORY_PATH
-        value: $(workspaces.basic-auth.path)
-      - name: WORKSPACE_SSL_CA_DIRECTORY_BOUND
-        value: $(workspaces.ssl-ca-directory.bound)
-      - name: WORKSPACE_SSL_CA_DIRECTORY_PATH
-        value: $(workspaces.ssl-ca-directory.path)
+        - name: HOME
+          value: "$(params.userHome)"
+        - name: PARAM_URL
+          value: $(params.url)
+        - name: PARAM_REVISION
+          value: $(params.revision)
+        - name: PARAM_REFSPEC
+          value: $(params.refspec)
+        - name: PARAM_SUBMODULES
+          value: $(params.submodules)
+        - name: PARAM_DEPTH
+          value: $(params.depth)
+        - name: PARAM_SSL_VERIFY
+          value: $(params.sslVerify)
+        - name: PARAM_SUBDIRECTORY
+          value: $(params.subdirectory)
+        - name: PARAM_DELETE_EXISTING
+          value: $(params.deleteExisting)
+        - name: PARAM_HTTP_PROXY
+          value: $(params.httpProxy)
+        - name: PARAM_HTTPS_PROXY
+          value: $(params.httpsProxy)
+        - name: PARAM_NO_PROXY
+          value: $(params.noProxy)
+        - name: PARAM_VERBOSE
+          value: $(params.verbose)
+        - name: PARAM_SPARSE_CHECKOUT_DIRECTORIES
+          value: $(params.sparseCheckoutDirectories)
+        - name: PARAM_USER_HOME
+          value: $(params.userHome)
+        - name: WORKSPACE_OUTPUT_PATH
+          value: $(workspaces.output.path)
+        - name: WORKSPACE_SSH_DIRECTORY_BOUND
+          value: $(workspaces.ssh-directory.bound)
+        - name: WORKSPACE_SSH_DIRECTORY_PATH
+          value: $(workspaces.ssh-directory.path)
+        - name: WORKSPACE_BASIC_AUTH_DIRECTORY_BOUND
+          value: $(workspaces.basic-auth.bound)
+        - name: WORKSPACE_BASIC_AUTH_DIRECTORY_PATH
+          value: $(workspaces.basic-auth.path)
+        - name: WORKSPACE_SSL_CA_DIRECTORY_BOUND
+          value: $(workspaces.ssl-ca-directory.bound)
+        - name: WORKSPACE_SSL_CA_DIRECTORY_PATH
+          value: $(workspaces.ssl-ca-directory.path)
       script: |
         #!/usr/bin/env sh
         set -eu
@@ -234,13 +234,13 @@ metadata:
   name: ansible-runner
   namespace: default
   labels:
-    app.kubernetes.io/version: '0.2'
-    app.kubernetes.io/ansible-version: '2.12.5'
+    app.kubernetes.io/version: "0.2"
+    app.kubernetes.io/ansible-version: "2.12.5"
   annotations:
-    tekton.dev/pipelines.minVersion: '0.12.1'
+    tekton.dev/pipelines.minVersion: "0.12.1"
     tekton.dev/categories: CLI
     tekton.dev/tags: cli
-    tekton.dev/displayName: 'Ansible Runner'
+    tekton.dev/displayName: "Ansible Runner"
     tekton.dev/platforms: "linux/amd64"
 spec:
   description: >-
@@ -252,7 +252,7 @@ spec:
   params:
     - name: project-dir
       description: The project directory under the workspace runner-dir
-      default: 'project'
+      default: "project"
     - name: args
       description: The arguments to pass ansible-runner
       type: array
@@ -288,17 +288,17 @@ spec:
           ansible-galaxy collection install -vv \
             -r requirements.yml
         fi
-      workingDir: '$(workspaces.runner-dir.path)/$(params.project-dir)'
+      workingDir: "$(workspaces.runner-dir.path)/$(params.project-dir)"
 
     - name: run-playbook
       image: $(params.image)
-      command: ['entrypoint']
+      command: ["entrypoint"]
       args:
         - ansible-runner
         - run
         - $(params.args)
         - $(params.project-dir)
-      workingDir: '$(workspaces.runner-dir.path)'
+      workingDir: "$(workspaces.runner-dir.path)"
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
@@ -311,47 +311,47 @@ spec:
     # - name: ssh-directory
     - name: runner-dir
   params:
-  - name: deleteExisting
-    type: string
-  - name: depth
-    type: string
-  - name: gitInitImage
-    type: string
-  - name: httpProxy
-    type: string
-  - name: httpsProxy
-    type: string
-  - name: noProxy
-    type: string
-  - name: refspec
-    type: string
-  - name: revision
-    type: string
-  - name: sparseCheckoutDirectories
-    type: string
-  - name: sslVerify
-    type: string
-  - name: subdirectory
-    type: string
-  - name: submodules
-    type: string
-  - name: url
-    type: string
-  - name: userHome
-    type: string
-  - name: verbose
-    type: string
-  - name: args
-    type: array
-  - name: image
-    type: string
-  - name: project-dir
-    type: string
-  - name: user-home
-    type: string
-  - name: storage-class
-    type: string
-    default: "ocs-storagecluster-cephfs"
+    - name: deleteExisting
+      type: string
+    - name: depth
+      type: string
+    - name: gitInitImage
+      type: string
+    - name: httpProxy
+      type: string
+    - name: httpsProxy
+      type: string
+    - name: noProxy
+      type: string
+    - name: refspec
+      type: string
+    - name: revision
+      type: string
+    - name: sparseCheckoutDirectories
+      type: string
+    - name: sslVerify
+      type: string
+    - name: subdirectory
+      type: string
+    - name: submodules
+      type: string
+    - name: url
+      type: string
+    - name: userHome
+      type: string
+    - name: verbose
+      type: string
+    - name: args
+      type: array
+    - name: image
+      type: string
+    - name: project-dir
+      type: string
+    - name: user-home
+      type: string
+    - name: storage-class
+      type: string
+      default: "ocs-storagecluster-cephfs"
   tasks:
     - name: create-pvc
       retries: 3
@@ -387,37 +387,39 @@ spec:
         # - name: ssh-directory
         #   workspace: ssh-directory
       params:
-      - name: deleteExisting
-        value: $(params.deleteExisting)
-      - name: depth
-        value: $(params.depth)
-      - name: gitInitImage
-        value: $(params.gitInitImage)
-      - name: httpProxy
-        value: $(params.httpProxy)
-      - name: httpsProxy
-        value: $(params.httpsProxy)
-      - name: noProxy
-        value: $(params.noProxy)
-      - name: refspec
-        value: $(params.refspec)
-      - name: revision
-        value: $(params.revision)
-      - name: sparseCheckoutDirectories
-        value: $(params.sparseCheckoutDirectories)
-      - name: sslVerify
-        value: $(params.sslVerify)
-      - name: subdirectory
-        value: $(params.subdirectory)
-      - name: submodules
-        value: $(params.submodules)
-      - name: url
-        value: $(params.url)
-      - name: userHome
-        value: $(params.userHome)
-      - name: verbose
-        value: $(params.verbose)
+        - name: deleteExisting
+          value: $(params.deleteExisting)
+        - name: depth
+          value: $(params.depth)
+        - name: gitInitImage
+          value: $(params.gitInitImage)
+        - name: httpProxy
+          value: $(params.httpProxy)
+        - name: httpsProxy
+          value: $(params.httpsProxy)
+        - name: noProxy
+          value: $(params.noProxy)
+        - name: refspec
+          value: $(params.refspec)
+        - name: revision
+          value: $(params.revision)
+        - name: sparseCheckoutDirectories
+          value: $(params.sparseCheckoutDirectories)
+        - name: sslVerify
+          value: $(params.sslVerify)
+        - name: subdirectory
+          value: $(params.subdirectory)
+        - name: submodules
+          value: $(params.submodules)
+        - name: url
+          value: $(params.url)
+        - name: userHome
+          value: $(params.userHome)
+        - name: verbose
+          value: $(params.verbose)
     - name: ansible-runner
+      timeout: 6h0m0s
+      retries: 3
       runAfter:
         - git-clone
       taskRef:
@@ -426,11 +428,11 @@ spec:
         - name: runner-dir
           workspace: runner-dir
       params:
-      - name: args
-        value: $(params.args[*])
-      - name: image
-        value: $(params.image)
-      - name: project-dir
-        value: $(params.project-dir)
-      - name: user-home
-        value: $(params.user-home)
+        - name: args
+          value: $(params.args[*])
+        - name: image
+          value: $(params.image)
+        - name: project-dir
+          value: $(params.project-dir)
+        - name: user-home
+          value: $(params.user-home)
