@@ -2,9 +2,10 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: cp4waiops
+  generateName: cp4waiops-
   namespace: default
 spec:
+  timeout: 6h0m0s
   pipelineRef:
     name: cp4waiops
     # resolver: hub
@@ -38,57 +39,56 @@ spec:
       - name: IBM_ENTITLEMENT_KEY
         value: "<PLACEHOLDER>"
   workspaces:
-  - name: output
-    persistentVolumeClaim:
-      claimName: ansible-playbooks
-  # - name: ssh-directory
-  #   emptydir: {}
+    - name: output
+      persistentVolumeClaim:
+        claimName: ansible-playbooks
+    # - name: ssh-directory
+    #   emptydir: {}
     # secret:
     #   secretName: git-credentials
-  - name: runner-dir
-    persistentVolumeClaim:
-      claimName: ansible-playbooks
+    - name: runner-dir
+      persistentVolumeClaim:
+        claimName: ansible-playbooks
   # serviceAccountName: ansible-deployer-account
   params:
-  - name: deleteExisting
-    value: "true"
-  - name: depth
-    value: "1"
-  - name: gitInitImage
-    value: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.21.0
-  - name: httpProxy
-    value: ""
-  - name: httpsProxy
-    value: ""
-  - name: noProxy
-    value: ""
-  - name: refspec
-    value: ""
-  - name: revision
-    value: main
-  - name: sparseCheckoutDirectories
-    value: ""
-  - name: sslVerify
-    value: "true"
-  - name: subdirectory
-    value: ""
-  - name: submodules
-    value: "true"
-  - name: url
-    value: https://github.com/cloud-native-toolkit/deployer-cp4waiops.git
-  - name: userHome
-    value: /tekton/home
-  - name: verbose
-    value: "true"
-  - name: args
-    value:
-    - -p
-    - cp4waiops.yaml
-    # - -vvv
-  - name: image
-    value: quay.io/ansible/ansible-runner:stable-2.12-latest
-  - name: project-dir
-    value: ""
-  - name: user-home
-    value: /tekton/home
-  
+    - name: deleteExisting
+      value: "true"
+    - name: depth
+      value: "1"
+    - name: gitInitImage
+      value: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.21.0
+    - name: httpProxy
+      value: ""
+    - name: httpsProxy
+      value: ""
+    - name: noProxy
+      value: ""
+    - name: refspec
+      value: ""
+    - name: revision
+      value: main
+    - name: sparseCheckoutDirectories
+      value: ""
+    - name: sslVerify
+      value: "true"
+    - name: subdirectory
+      value: ""
+    - name: submodules
+      value: "true"
+    - name: url
+      value: https://github.com/cloud-native-toolkit/deployer-cp4waiops.git
+    - name: userHome
+      value: /tekton/home
+    - name: verbose
+      value: "true"
+    - name: args
+      value:
+        - -p
+        - cp4waiops.yaml
+      # - -vvv
+    - name: image
+      value: quay.io/ansible/ansible-runner:stable-2.12-latest
+    - name: project-dir
+      value: ""
+    - name: user-home
+      value: /tekton/home

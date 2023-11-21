@@ -4,6 +4,10 @@
   kubernetes.core.k8s:
     template: ./installation-cr.j2
     state: present
+  register: result
+  until: result is not failed
+  retries: 20
+  delay: 30
 
 - name: Wait for Installation Custom Resource (60-90 minutes)
   kubernetes.core.k8s_info:
